@@ -1,27 +1,55 @@
 const express = require('express') //soliicta o express
 app = express() //atribui o express na variável app
 const cors = require('cors')
-const PORT = 3001
+const connection = require('./db.js')
+const PORT = 3004
 app.use(cors())
 
-app.get('/', (req, res) => {
-    res.send("hello world")
-})
-
+app.use(express.json())
 
 app.listen(PORT, () =>{
     console.log(`servidor rodando na porta ${PORT}`)
 });
 
+app.get('/', (req, res) => {
+    res.send("hello world")
+});
+
+
 app.post('/registrar', (req, res) => {
-    let params = Array(
-        request.body.placa,
-        request.body.modelo,
-        request.body.nome_cliente, 
-        request.body.email
-    )
 
-    let query = `INSRT INTO Carros(placa, modelo, nome_cliente, email) VALUES(?, ?, ?, ?)`
+    const { placa, modelo, nome_cliente, email } = req.body
 
-    let connection
+//trim() é um método que remove espaços em branco no início e no final da string, uso para verificar se o usuário não irá passar apenas um espaço em branco, pois ele contaria como string
+
+    if (!placa || !modelo || !nome_cliente || !email || placa.trim() === "" || modelo.trim() === "" || nome_cliente.trim() === "" || email.trim() === "")  {
+       return res.status(400).json({
+            success: false,
+            message: "Todos os campos são obrigatórios!"
+        })
+    } 
+
+    const params = [placa, modelo, nome_cliente, email]
+
+    const query = `INSERT INTO Carros(placa, modelo, nome_cliente, email) VALUES (?, ?, ?, ?)`
+
+   
+
+    connection.query(query, params, (err, result) => {
+       if (err) {
+        return res.status(500).json({
+            success:false,
+            message: "Erro ao cadastrar",
+            data: err
+        })
+       } else {
+        return res.status(200).json({
+            success:true,
+            message:"Cadastro concluído!",
+            data: result
+    
+        })
+       }
+    })
 })
+
