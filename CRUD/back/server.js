@@ -53,3 +53,42 @@ app.post('/registrar', (req, res) => {
     })
 })
 
+app.get('/exibir', (req, res) => {
+
+    connection.query = `SELECT * FROM Carros`
+
+    connection.query(query, (err, results) => {
+        if (err) {
+            return res.status(500).json({ 
+                success: false,
+                message: 'Erro ao buscar carro no banco de dados' })
+        }
+        res.json({ success: true, data: results })
+    })
+    
+})
+
+
+app.delete('/deletar', (req, res) => {
+
+    connection.query = `DELTE FROM Carros WHERE id = ?`
+
+    connection.query(query, (err, results) => {
+        if (err){ 
+            return res.status(500).json({
+                success: false,
+                message: 'Erro ao deletar carro do banco de dados'
+
+            })
+        }
+    })
+})
+
+
+app.put('/editar/:id', (req, res) => {
+    const {id} = req.parmas
+    const {placa, mdoelo, nome_cliente, email} = req.body
+
+    connection.query = `UPDATE Cliente SET placa =?  modelo = ? nome_cliente = ? email = ? WHERE id = ?`
+
+})
