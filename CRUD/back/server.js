@@ -55,23 +55,35 @@ app.post('/registrar', (req, res) => {
 
 app.get('/exibir', (req, res) => {
 
-    connection.query = `SELECT * FROM Carros`
+    const query = `SELECT * FROM Carros`
 
     connection.query(query, (err, results) => {
         if (err) {
             return res.status(500).json({ 
                 success: false,
                 message: 'Erro ao buscar carro no banco de dados' })
+        } else {
+            res.json({ success: true, 
+            data: results })
         }
-        res.json({ success: true, data: results })
     })
-    
 })
 
 
-app.delete('/deletar', (req, res) => {
+app.delete('/deletar/:id', (req, res) => {
 
-    connection.query = `DELTE FROM Carros WHERE id = ?`
+    const {id} = req.params
+
+    if (!id){
+        return res.status(400).json({
+            message: "O ID não foi passado corretamente!",
+            success: false
+        })
+    }
+
+    const atualizarIdQuery  = `UPDATE Carros SET WHERE id = - 1 ` //TENHO QUE ARRUMAR ISSO AINDA 
+
+    const query = `DELETE FROM Carros WHERE id = ?`
 
     connection.query(query, (err, results) => {
         if (err){ 
@@ -86,9 +98,18 @@ app.delete('/deletar', (req, res) => {
 
 
 app.put('/editar/:id', (req, res) => {
-    const {id} = req.parmas
+    const {id} = req.params
     const {placa, mdoelo, nome_cliente, email} = req.body
 
-    connection.query = `UPDATE Cliente SET placa =?  modelo = ? nome_cliente = ? email = ? WHERE id = ?`
+    const query = `UPDATE Cliente SET placa = ?  modelo = ? nome_cliente = ? email = ? WHERE id = ?`
+    connection.query(query, (results, err) => {
+        if(err){
+            return res.status(500).json({
+                success: false,
+                message: 'Erro ao editar usuário',
+                data: err
+            })
+        }
+    })
 
 })
