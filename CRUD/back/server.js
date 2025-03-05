@@ -81,16 +81,21 @@ app.delete('/deletar/:id', (req, res) => {
         })
     }
 
-    const atualizarIdQuery  = `UPDATE Carros SET WHERE id = - 1 ` //TENHO QUE ARRUMAR ISSO AINDA 
-
     const query = `DELETE FROM Carros WHERE id = ?`
 
-    connection.query(query, (err, results) => {
+    connection.query(query, [id], (err, results) => {
         if (err){ 
             return res.status(500).json({
                 success: false,
                 message: 'Erro ao deletar carro do banco de dados'
 
+            })
+        } 
+
+        if (results.affectedRows === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Carro não encontrado"
             })
         }
     })
@@ -99,15 +104,22 @@ app.delete('/deletar/:id', (req, res) => {
 
 app.put('/editar/:id', (req, res) => {
     const {id} = req.params
-    const {placa, mdoelo, nome_cliente, email} = req.body
+    const {placa, modelo, nome_cliente, email} = req.body
 
-    const query = `UPDATE Cliente SET placa = ?  modelo = ? nome_cliente = ? email = ? WHERE id = ?`
-    connection.query(query, (results, err) => {
+    const query = `UPDATE Carros SET placa = ? , modelo = ?, nome_cliente = ?, email = ? WHERE id = ?`
+
+    connection.query(query, [placa, modelo, nome_cliente, email, id], (err, results) => {
         if(err){
             return res.status(500).json({
                 success: false,
-                message: 'Erro ao editar usuário',
+                message: 'Erro ao editar carro',
                 data: err
+            })
+        } else {
+            return res.status(200).json({
+                success: true,
+                message: "Informações alteradas com sucesso!",
+                data: results
             })
         }
     })
